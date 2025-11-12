@@ -5,8 +5,9 @@ const NodeCache = require('node-cache');
 require('dotenv').config();
 
 const app = express();
-const cache = new NodeCache({ stdTTL: 3600 }); // Cache 1h
+const cache = new NodeCache({ stdTTL: 3600 });
 
+// CORS doit être AVANT les routes
 app.use(cors());
 app.use(express.json());
 
@@ -18,13 +19,11 @@ app.get('/api/rates', async (req, res) => {
         const { from = 'JPY', to = 'EUR' } = req.query;
         const cacheKey = `${from}_${to}`;
 
-        // Vérifier le cache
         const cached = cache.get(cacheKey);
         if (cached) {
             return res.json({ ...cached, cached: true });
         }
 
-        // Appel API
         const response = await axios.get(
             `${BASE_URL}/${API_KEY}/pair/${from}/${to}`
         );
@@ -40,7 +39,8 @@ app.get('/api/rates', async (req, res) => {
         res.json({ ...data, cached: false });
 
     } catch (error) {
-        res.status(500).json({ error: 'Erreur API' });
+        console.error('Erreur API:', error.message);
+        res.status(500).json({ error: 'Erreur lors de la récupération du taux' });
     }
 });
 

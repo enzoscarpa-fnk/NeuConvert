@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: neuconvert-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - ./secrets/.env
+    restart: unless-stopped
+    networks:
+      - neuconvert-network
+
+  frontend:
+    build: ./frontend
+    container_name: neuconvert-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - neuconvert-network
+
+networks:
+  neuconvert-network:
+    driver: bridge

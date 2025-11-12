@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+
+:root {
+  --color-neu-bg: #e0e0e0;
+  --color-neu-dark: #bebebe;
+  --color-neu-light: #ffffff;
+  --color-neu-text: #6b7280;
+  --color-neu-text-dark: #374151;
+}

@@ -1,3 +1,36 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Amélioration du feedback tactile sur mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Retirer les flèches du input number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Scroll fluide */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Optimisation des performances d'animation */
+button,
+input {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Désactiver le zoom double-tap sur iOS */
+input,
+button {
+  touch-action: manipulation;
+}
