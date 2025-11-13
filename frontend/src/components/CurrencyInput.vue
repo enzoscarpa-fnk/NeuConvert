@@ -18,7 +18,7 @@ const handleInput = (e) => {
 
 <template>
   <div class="mb-6">
-    <label class="block text-xs font-semibold text-gray-500 mb-3 ml-1 uppercase tracking-wide">
+    <label class="block text-xs font-semibold text-[var(--color-neu-text)] mb-3 ml-1 uppercase tracking-wide transition-colors duration-300">
       {{ label }} ({{ currency }})
     </label>
     <div class="relative">
@@ -28,16 +28,16 @@ const handleInput = (e) => {
         @input="handleInput"
         @focus="focused = true"
         @blur="focused = false"
-        class="w-full px-6 py-5 bg-[#e0e0e0] rounded-[20px] text-2xl sm:text-3xl font-bold
-               text-gray-700 focus:outline-none transition-all duration-300 ease-out
-               placeholder:text-gray-400"
-        :class="focused
-          ? 'shadow-[inset_2px_2px_4px_#c5c5c5,inset_-2px_-2px_4px_#fbfbfb]'
-          : 'shadow-[inset_4px_4px_8px_#c5c5c5,inset_-4px_-4px_8px_#fbfbfb]'"
+        class="w-full px-6 py-5 bg-[var(--color-neu-bg)] rounded-[20px] text-2xl sm:text-3xl font-bold
+               text-[var(--color-neu-text-dark)] focus:outline-none transition-all duration-300 ease-out
+               placeholder:text-[var(--color-neu-text)]"
+        :style="focused
+          ? { boxShadow: 'inset 2px 2px 4px var(--color-neu-shadow-dark), inset -2px -2px 4px var(--color-neu-shadow-light)' }
+          : { boxShadow: 'inset 4px 4px 8px var(--color-neu-shadow-dark), inset -4px -4px 8px var(--color-neu-shadow-light)' }"
         placeholder="0"
         inputmode="decimal"
       />
-      <div class="absolute right-6 top-1/2 -translate-y-1/2 text-lg font-bold text-gray-500">
+      <div class="absolute right-6 top-1/2 -translate-y-1/2 text-lg font-bold text-[var(--color-neu-text)] transition-colors duration-300">
         {{ currency }}
       </div>
     </div>

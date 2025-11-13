@@ -1,9 +1,21 @@
 @import 'tailwindcss';
 
 :root {
+  /* Light mode */
   --color-neu-bg: #e0e0e0;
-  --color-neu-dark: #bebebe;
-  --color-neu-light: #ffffff;
+  --color-neu-shadow-dark: #c5c5c5;
+  --color-neu-shadow-light: #fbfbfb;
   --color-neu-text: #6b7280;
   --color-neu-text-dark: #374151;
+  --color-accent: #3b82f6;
+}
+
+.dark {
+  /* Dark mode */
+  --color-neu-bg: #2c2c2c;
+  --color-neu-shadow-dark: #1a1a1a;
+  --color-neu-shadow-light: #3e3e3e;
+  --color-neu-text: #9ca3af;
+  --color-neu-text-dark: #e5e7eb;
+  --color-accent: #f97316;
 }

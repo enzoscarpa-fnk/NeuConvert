@@ -19,25 +19,26 @@ const formattedResult = computed(() => {
 </script>
 
 <template>
-  <div class="bg-[#e0e0e0] rounded-[20px] shadow-[inset_4px_4px_8px_#c5c5c5,inset_-4px_-4px_8px_#fbfbfb] p-6 min-h-[120px] flex flex-col justify-center">
-    <label class="block text-xs font-semibold text-gray-500 mb-3 ml-1 uppercase tracking-wide">
+  <div class="bg-[var(--color-neu-bg)] rounded-[20px] p-6 min-h-[120px] flex flex-col justify-center transition-all duration-300"
+       style="box-shadow: inset 4px 4px 8px var(--color-neu-shadow-dark), inset -4px -4px 8px var(--color-neu-shadow-light);">
+    <label class="block text-xs font-semibold text-[var(--color-neu-text)] mb-3 ml-1 uppercase tracking-wide transition-colors duration-300">
       Résultat ({{ currency }})
     </label>
 
     <Transition name="slide-fade" mode="out-in">
       <div v-if="loading" class="flex items-center justify-center py-4">
         <div class="flex gap-1.5">
-          <span class="w-2 h-2 bg-gray-700 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-          <span class="w-2 h-2 bg-gray-700 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-          <span class="w-2 h-2 bg-gray-700 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+          <span class="w-2 h-2 bg-[var(--color-neu-text-dark)] rounded-full animate-bounce transition-colors duration-300" style="animation-delay: 0ms"></span>
+          <span class="w-2 h-2 bg-[var(--color-neu-text-dark)] rounded-full animate-bounce transition-colors duration-300" style="animation-delay: 150ms"></span>
+          <span class="w-2 h-2 bg-[var(--color-neu-text-dark)] rounded-full animate-bounce transition-colors duration-300" style="animation-delay: 300ms"></span>
         </div>
       </div>
 
       <div v-else :key="formattedResult">
-        <div class="text-3xl sm:text-4xl font-bold text-gray-700 mb-2">
+        <div class="text-3xl sm:text-4xl font-bold text-[var(--color-neu-text-dark)] mb-2 transition-colors duration-300">
           {{ formattedResult }}
         </div>
-        <div class="flex items-center justify-end gap-1.5 text-xs text-gray-500">
+        <div class="flex items-center justify-end gap-1.5 text-xs text-[var(--color-neu-text)] transition-colors duration-300">
           <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
           <span>Taux en temps réel</span>
         </div>
