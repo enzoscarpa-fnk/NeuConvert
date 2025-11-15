@@ -1,8 +1,8 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: neuconvert-backend
     ports:
       - "3000:3000"
@@ -10,18 +10,26 @@ services:
       - NODE_ENV=production
       - PORT=3000
     env_file:
-      - ./secrets/.env
+      - /secrets/.env
     restart: unless-stopped
     networks:
       - neuconvert-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: neuconvert-frontend
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - neuconvert-network
