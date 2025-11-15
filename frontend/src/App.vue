@@ -24,7 +24,8 @@ let animationFrameId = null
 let petals = []
 let fadingOut = false
 
-const API_URL = ''
+//const API_URL = 'http://localhost:3000' // dev
+const API_URL = '' // prod
 
 class Petal {
   constructor(canvas) {
