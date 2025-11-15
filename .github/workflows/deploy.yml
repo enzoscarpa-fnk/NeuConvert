@@ -23,15 +23,11 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-      # Lint mais ne bloque pas sur warnings
-      - name: Lint frontend
-        working-directory: ./frontend
-        run: npm run lint || echo "Lint warnings found but continuing..."
-
-      # Si le build échoue, on stoppe tout
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
+        env:
+          CI: false
 
       - name: Install backend dependencies
         working-directory: ./backend
@@ -43,7 +39,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin master

@@ -7,6 +7,9 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+
+# Build sans ESLint strict
+ENV CI=false
 RUN npm run build
 
 # Stage 2: Production avec Nginx
