@@ -23,10 +23,12 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      # Lint mais ne bloque pas sur warnings
       - name: Lint frontend
         working-directory: ./frontend
-        run: npm run lint || true
+        run: npm run lint || echo "Lint warnings found but continuing..."
 
+      # Si le build échoue, on stoppe tout
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
@@ -45,16 +47,8 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin master
-            
-            # Arrête et supprime uniquement les conteneurs NeuConvert
             docker-compose down
-            
-            # Supprime les anciennes images NeuConvert uniquement
             docker images | grep neuconvert | awk '{print $3}' | xargs -r docker rmi -f || true
-            
-            # Rebuild et redémarre
             docker-compose build --no-cache
             docker-compose up -d
-            
-            # Nettoyage léger : uniquement les images "dangling" (sans tag)
             docker image prune -f
