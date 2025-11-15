@@ -8,7 +8,6 @@ RUN npm ci
 
 COPY . .
 
-# Build sans ESLint strict
 ENV CI=false
 RUN npm run build
 
