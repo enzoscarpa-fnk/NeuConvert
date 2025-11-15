@@ -3,7 +3,7 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -44,8 +44,17 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
-            git pull origin main
+            git pull origin master
+            
+            # Arrête et supprime uniquement les conteneurs NeuConvert
             docker-compose down
+            
+            # Supprime les anciennes images NeuConvert uniquement
+            docker images | grep neuconvert | awk '{print $3}' | xargs -r docker rmi -f || true
+            
+            # Rebuild et redémarre
             docker-compose build --no-cache
             docker-compose up -d
-            docker system prune -af --volumes
+            
+            # Nettoyage léger : uniquement les images "dangling" (sans tag)
+            docker image prune -f
