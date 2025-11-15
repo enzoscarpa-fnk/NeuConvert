@@ -1,7 +1,26 @@
+<script setup>
+import { ref } from 'vue'
+import { useDarkMode } from '../composables/useDarkMode'
+
+const emit = defineEmits(['toggle-sakura'])
+const sakuraMode = ref(false)
+const { isDark } = useDarkMode()
+
+const toggleSakura = () => {
+  sakuraMode.value = !sakuraMode.value
+  emit('toggle-sakura', sakuraMode.value)
+}
+</script>
+
 <template>
   <div class="flex justify-center pt-2">
-    <div class="inline-flex items-center gap-2 bg-[var(--color-neu-bg)] rounded-full px-4 py-2 transition-all duration-300"
-         style="box-shadow: 4px 4px 8px var(--color-neu-shadow-dark), -4px -4px 8px var(--color-neu-shadow-light);">
+    <button
+      @click="toggleSakura"
+      class="inline-flex items-center gap-2 bg-[var(--color-neu-bg)] rounded-full px-4 py-2 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+      :style="sakuraMode
+        ? { boxShadow: 'inset 4px 4px 8px var(--color-neu-shadow-dark), inset -4px -4px 8px var(--color-neu-shadow-light)' }
+        : { boxShadow: '4px 4px 8px var(--color-neu-shadow-dark), -4px -4px 8px var(--color-neu-shadow-light)' }"
+    >
 
       <!-- Fox SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 128 128">
@@ -29,8 +48,6 @@
         <path fill="#2f2f2f" d="M34.82 88.19c-3.13-.03-5.68 2.93-5.71 6.57c-.01 3.66 2.51 6.63 5.65 6.65c3.11.01 5.68-2.92 5.69-6.59c.04-3.63-2.5-6.62-5.63-6.63m37.93 0c-3.14.01-5.67 3-5.63 6.64c0 3.66 2.57 6.6 5.68 6.59c3.14-.03 5.67-3 5.65-6.65s-2.57-6.61-5.7-6.58m-5.13 24.89c-1.94-.99-3.85 1.9-5.68 2.12c-2.13.25-4.07-.7-4.37-1.74c-.12-.39-.25-1.94-.28-2.28c2.87-1.15 4.3-3.25 4.28-4.37c0-.75-.36-1.45-1.07-1.53c-.76-.09-1.25.31-1.84.73c-1.44 1.02-2.03 1.57-4.33 1.55c-1.55-.01-2.78-.78-3.71-1.6c-.42-.36-1.39-1-2.17-.31c-1.7 1.51 1.02 4.24 2.46 4.88c.65.29 1.2.56 1.81.79c0 .93-.01 1.86-.03 2.02c-.1 1.21-1.36 1.81-2.47 2.09c-.94.23-2.28.06-3.17-.31c-.82-.33-1.34-1.15-1.91-1.77c-.6-.65-1.34-.93-2.04-.58c-1.14.57-1.24 1.96-.57 3.28c.83 1.61 1.82 2.21 2.91 2.82c1.5.85 4.96 1.11 7.22.08c1.86-.85 2.5-1.97 3.84-.94c1.83 1.39 4.45 1.55 6.79.96c1.98-.52 6.97-4.54 4.33-5.89"/>
         <path fill="#ed80ad" d="M101.08 23.97C90.81 24 81.91 34.45 77.34 42.58c-2.06 3.66-3.89 7.83-4.58 11.98c-.48 2.88-.02 5.82 3.25 6.5c1.49.31 2.71-.23 3.74-1.13c1.44-1.28 2.53-3.3 3.5-4.72c2.74-4.04 5.21-8 8.49-11.66c2.59-2.88 4.91-5.77 7.7-8.48c2.47-2.41 5.8-5.59 4.87-9.42c-.32-1.27-2.13-1.68-3.23-1.68M45.96 55.56c.55-2.01.68-4.48.72-6.5c.11-8.5 4.98-17.12 7.97-24.87c1.1-2.85 4.18-11.87-2.14-10.38c-4.97 1.19-9.14 7.33-11.03 11.69c-2.08 4.78-3.29 9.98-3.87 15.16c-.29 2.59-.31 5.2-.19 7.81c.11 2.38-.05 5.26.87 7.49c.65 1.58 1.86 1.93 3.52 1.77c1.35-.13 3.1-.35 3.87-1.51c.12-.2.22-.42.28-.66"/>
       </svg>
-    </div>
+    </button>
   </div>
 </template>
-<script setup lang="ts">
-</script>

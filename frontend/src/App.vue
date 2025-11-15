@@ -1,10 +1,11 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import CurrencyInput from './components/CurrencyInput.vue'
 import ConversionResult from './components/ConversionResult.vue'
 import SwitchButton from './components/SwitchButton.vue'
 import Header from './components/Header.vue'
-import FooterButton from "@/components/FooterButton.vue";
+import FooterButton from './components/FooterButton.vue'
+import { useDarkMode } from './composables/useDarkMode'
 
 const amount = ref(100)
 const fromCurrency = ref('JPY')
@@ -13,8 +14,165 @@ const conversionRate = ref(null)
 const lastUpdate = ref(null)
 const loading = ref(false)
 const error = ref(null)
+const sakuraAlpha = ref(1)
+const fadeValue = ref(1)
+const sakuraMode = ref(false)
+
+const { isDark } = useDarkMode()
+
+let animationFrameId = null
+let petals = []
+let fadingOut = false
 
 const API_URL = 'http://localhost:3000'
+
+class Petal {
+  constructor(canvas) {
+    this.canvas = canvas
+    this.reset()
+  }
+
+  reset() {
+    this.x = Math.random() * this.canvas.width
+    this.y = -20
+    this.speed = Math.random() * 0.8 + 0.3 // Plus lent (0.3-1.1 au lieu de 1-3)
+    this.amplitude = Math.random() * 40 + 20
+    this.frequency = Math.random() * 0.008 + 0.004 // Mouvement plus doux
+    this.rotation = Math.random() * 360
+    this.rotationSpeed = Math.random() * 2 - 1 // Rotation plus lente
+    this.size = Math.random() * 8 + 5
+    this.opacity = Math.random() * 0.3 + 0.5
+    this.swayOffset = Math.random() * Math.PI * 2 // Pour un mouvement décalé
+  }
+
+  update() {
+    this.y += this.speed
+    // Mouvement de balancier naturel
+    this.x += Math.sin(this.y * this.frequency + this.swayOffset) * 1.5
+    this.rotation += this.rotationSpeed
+
+    if (this.y > this.canvas.height + 20) {
+      this.reset()
+    }
+  }
+
+  draw(ctx, isDark, fadeValue) {
+    ctx.save()
+    ctx.translate(this.x, this.y)
+    ctx.rotate((this.rotation * Math.PI) / 180)
+
+    ctx.globalAlpha = this.opacity * fadeValue
+
+    // Dégradé couleur (pareil qu'avant)
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size)
+    if (isDark) {
+      gradient.addColorStop(0, '#b39ddb')
+      gradient.addColorStop(0.5, '#9575cd')
+      gradient.addColorStop(1, '#7e57c2')
+    } else {
+      gradient.addColorStop(0, '#ffc1e3')
+      gradient.addColorStop(0.5, '#ffb3d9')
+      gradient.addColorStop(1, '#ff99cc')
+    }
+    ctx.fillStyle = gradient
+
+    // -- SAKURA PETAL PATH --
+    ctx.beginPath()
+    // pétale orienté verticalement, pointe vers le bas
+    const r = this.size
+    // Base du pétale (haut du path)
+    ctx.moveTo(0, 0)
+    // Bord gauche
+    ctx.bezierCurveTo(-0.2*r, -0.1*r, -0.5*r, -0.7*r, 0, -r)
+    // Pointe
+    ctx.bezierCurveTo(0.5*r, -0.7*r, 0.2*r, -0.1*r, 0, 0)
+    // Creux à la base
+    ctx.bezierCurveTo(-0.08*r, 0.1*r, 0.08*r, 0.1*r, 0, 0)
+    ctx.closePath()
+    ctx.fill()
+
+    // Option : liseré blanc léger
+    ctx.strokeStyle = isDark ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.45)"
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    ctx.restore()
+  }
+
+}
+
+const startSakuraAnimation = () => {
+  const canvas = document.getElementById('sakura-canvas')
+  if (!canvas) return
+
+  const ctx = canvas.getContext('2d')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+
+  petals = []
+  for (let i = 0; i < 40; i++) {
+    const petal = new Petal(canvas)
+    petal.y = Math.random() * canvas.height - canvas.height
+    petals.push(petal)
+  }
+
+  const animate = () => {
+    const canvas = document.getElementById('sakura-canvas')
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    petals.forEach(petal => {
+      petal.update()
+      petal.draw(ctx, isDark.value, fadeValue.value) // on passe fadeValue ici
+    })
+
+    // Gestion du fade-out
+    if (fadingOut) {
+      fadeValue.value -= 0.01
+      if (fadeValue.value <= 0) {
+        fadeValue.value = 0
+        fadingOut = false
+        sakuraMode.value = false
+        petals = []
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        return
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(animate)
+  }
+
+  animate()
+}
+
+const startFadeOut = () => {
+  fadingOut = true
+}
+
+const handleToggleSakura = (isActive) => {
+  if (isActive) {
+    fadeValue.value = 1
+    sakuraMode.value = true
+    fadingOut = false
+    setTimeout(startSakuraAnimation, 100)
+  } else {
+    // Commencer un fade out au lieu de désactivation brutale
+    sakuraMode.value = false
+    if (!fadingOut) {
+      startFadeOut()
+    }
+  }
+}
+
+const handleResize = () => {
+  const canvas = document.getElementById('sakura-canvas')
+  if (canvas && sakuraMode.value) {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+  }
+}
 
 const fetchRate = async () => {
   loading.value = true
@@ -53,7 +211,7 @@ const fetchRate = async () => {
     }))
   } catch (err) {
     console.error('Erreur:', err)
-    error.value = 'Le backend ne répond pas. Vérifiez qu\'il est démarré (cd backend && npm run dev)'
+    error.value = 'Le backend ne répond pas. Vérifiez qu\'il est démarré'
   } finally {
     loading.value = false
   }
@@ -73,12 +231,28 @@ const formatDate = (dateString) => {
 }
 
 watch([fromCurrency, toCurrency], fetchRate)
-onMounted(fetchRate)
+
+onMounted(() => {
+  fetchRate()
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--color-neu-bg)] flex justify-center pt-8 p-4 transition-colors duration-300">
-    <div class="w-full max-w-md">
+  <div
+    class="min-h-screen bg-[var(--color-neu-bg)] flex justify-center pt-8 p-4 relative transition-colors duration-300"
+  >
+    <!-- Canvas pour les pétales -->
+    <canvas
+      id="sakura-canvas"
+      class="fixed inset-0 pointer-events-none z-20"
+    />
+
+    <div class="w-full max-w-md relative z-10">
       <!-- Header avec logo et dark mode toggle -->
       <Header />
 
@@ -90,9 +264,6 @@ onMounted(fetchRate)
 
       <!-- Card principale -->
       <div class="bg-[var(--color-neu-bg)] rounded-[28px] p-6 sm:p-8 transition-all duration-300"
-           :class="$el?.classList.contains('dark')
-             ? 'shadow-[6px_6px_12px_var(--color-neu-shadow-dark),-6px_-6px_12px_var(--color-neu-shadow-light)]'
-             : 'shadow-[6px_6px_12px_#c5c5c5,-6px_-6px_12px_#fbfbfb]'"
            style="box-shadow: 6px 6px 12px var(--color-neu-shadow-dark), -6px -6px 12px var(--color-neu-shadow-light);">
         <CurrencyInput
           :modelValue="amount"
@@ -143,7 +314,7 @@ onMounted(fetchRate)
           <span>Mis à jour : {{ formatDate(lastUpdate) }}</span>
         </div>
 
-        <FooterButton />
+        <FooterButton @toggle-sakura="handleToggleSakura" />
       </div>
     </div>
   </div>
